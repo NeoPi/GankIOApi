@@ -29,6 +29,13 @@ public class MeiziApi {
   // http://gank.io/api/data/数据类型/请求个数/第几页
 
   private static final String BASE_MEIZI_URL = "http://gank.io/api/data/福利/%d/%d";
+
+  /**
+   *
+   * @param offset 请求个数
+   * @param page 页数
+   * @return
+   */
   public static Observable<GankMeiziData> getMeitu(int offset,int page){
 
     return GankApi.rxGet(buildUrl(offset,page))
@@ -83,53 +90,6 @@ public class MeiziApi {
           }
         });
   }
-
-
-  public static Flowable<Integer> rxDownLoadWithProgress(String url) {
-    String fileName = System.currentTimeMillis()+""+url.substring( url.lastIndexOf("."));
-
-    return Flowable.create(new FlowableOnSubscribe<Integer>() {
-      @Override public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
-
-      }
-    }, BackpressureStrategy.BUFFER).subscribeOn(Schedulers.newThread());
-    //return GankApi.rxDownLoad(url)
-    //    .map(new Function<ResponseBody, Integer>() {
-    //      @Override public Integer apply(@NonNull ResponseBody responseBody){
-    //        FileOutputStream fos = null;
-    //        File saveFile = getSavePath(fileName);
-    //        try {
-    //          InputStream inputStream = responseBody.byteStream();
-    //          long totalLen = responseBody.contentLength();
-    //          long readed = 0;
-    //          fos = new FileOutputStream(saveFile);
-    //          byte[] reads = new byte[1024];
-    //          int len = 0;
-    //          while ( (len = inputStream.read(reads)) != -1){
-    //            fos.write(reads,0,len);
-    //            readed += len;
-    //          }
-    //          fos.flush();
-    //          inputStream.close();
-    //        } catch (FileNotFoundException e) {
-    //          e.printStackTrace();
-    //        } catch (IOException e) {
-    //          e.printStackTrace();
-    //        } finally {
-    //          if (fos != null) {
-    //            try {
-    //              fos.close();
-    //            } catch (IOException e) {
-    //              e.printStackTrace();
-    //            }
-    //          }
-    //          responseBody.close();
-    //        }
-    //        return saveFile;
-    //      }
-    //    });
-  }
-
 
   public static File getSavePath(String name){
 

@@ -18,7 +18,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 public class GankApplication extends Application {
 
-
   ImagePipelineConfig imagePipelineConfig ;
   @Override public void onCreate() {
     super.onCreate();
@@ -32,7 +31,8 @@ public class GankApplication extends Application {
   private void initOkHttp() {
     OkHttpClient.Builder build = new OkHttpClient.Builder();
     HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+    // // FIXME: 2017/03/04 如果下载进度需要在RxJava的onNext方法中回调，此处的Level.NONE 不可修改，
+    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
     build.addInterceptor(loggingInterceptor);
     build.readTimeout(10, TimeUnit.SECONDS);
     GankApi.initOkHttpClient(build.build());

@@ -74,7 +74,6 @@ public class GankMeituFragment extends Fragment {
           }
 
           @Override public void onNext(GankMeiziData gankMeiziData) {
-            //Log.e("1111",gankMeiziData.toString());
             mData = gankMeiziData ;
             mGankMeituRecyAdapter.updateData(mData.getResults());
           }

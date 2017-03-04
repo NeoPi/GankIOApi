@@ -1,15 +1,18 @@
 package com.neopi.gankio.ui.activity;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.transition.Explode;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
+import android.widget.Toast;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
@@ -19,12 +22,8 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.neopi.gankio.BaseActivity;
 import com.neopi.gankio.R;
 import com.neopi.gankio.api.GankApi;
-import com.neopi.gankio.api.MeiziApi;
 import com.neopi.gankio.utils.DeviceUtils;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import java.io.File;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
@@ -42,10 +41,7 @@ public class MeiziDetaileActivity extends BaseActivity {
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    //getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-    //getWindow().setExitTransition(new Explode());//new Slide()  new Fade()
     setContentView(R.layout.activity_meizi_detail_layout);
-
     initView();
 
   }
@@ -85,58 +81,69 @@ public class MeiziDetaileActivity extends BaseActivity {
 
     mSaveButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-      //  MeiziApi.rxDownLoad(imageUrl)
-      //      .observeOn(AndroidSchedulers.mainThread())
-      //      .subscribe(new Observer<File>() {
-      //        @Override public void onSubscribe(Disposable disposable) {
-      //
-      //        }
-      //
-      //        @Override public void onNext(File file) {
-      //          Log.e("1111",file.getAbsolutePath());
-      //        }
-      //
-      //        @Override public void onError(Throwable throwable) {
-      //          throwable.printStackTrace();
-      //        }
-      //
-      //        @Override public void onComplete() {
-      //
-      //        }
-      //      });
+        //imageUrl = "http://a1.bbs.xiaomi.cn/download/apk/xiaomibbs_20161110.apk";
 
-        imageUrl = "http://a1.bbs.xiaomi.cn/download/apk/xiaomibbs_20161110.apk";
-        GankApi.rxDownLoadWithProgress(imageUrl)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Subscriber<Integer>() {
-              Subscription sub = null;
-              @Override public void onSubscribe(Subscription subscription) {
-                Log.e("1111","onSubscribe :"+Thread.currentThread());
-                sub = subscription;
-                showDownLoadProgress(0);
-                sub.request(Long.MAX_VALUE);
-              }
+        if (ActivityCompat.checkSelfPermission(MeiziDetaileActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+             != PermissionChecker.PERMISSION_GRANTED) {
+          // TODO: 2017/03/04  no write external storage permission
 
-              @Override public void onNext(Integer integer) {
-                //Log.e("1111","onNext:"+integer.intValue()+""+Thread.currentThread());
-                showDownLoadProgress(integer);
-                sub.request(Long.MAX_VALUE);
-              }
+          if (ActivityCompat.shouldShowRequestPermissionRationale(MeiziDetaileActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
 
-              @Override public void onError(Throwable throwable) {
-                throwable.printStackTrace();
-                sub.cancel();
-              }
+          } else {
+            ActivityCompat.requestPermissions(MeiziDetaileActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},100);
+          }
 
-              @Override public void onComplete() {
-                Log.e("1111","onComplete:"+Thread.currentThread());
-                if (mProgressDialog != null) {
-                  mProgressDialog.dismiss();
-                }
-              }
-            });
+        } else {
+          startDownload();
+        }
       }
+
     });
+  }
+
+  private void startDownload() {
+    GankApi.rxDownLoadWithProgress(imageUrl)
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Subscriber<Integer>() {
+          Subscription sub = null;
+          @Override public void onSubscribe(Subscription subscription) {
+            Log.e("1111","onSubscribe :"+Thread.currentThread());
+            sub = subscription;
+            showDownLoadProgress(0);
+            sub.request(Long.MAX_VALUE);
+          }
+
+          @Override public void onNext(Integer integer) {
+            //Log.e("1111","onNext:"+integer.intValue()+""+Thread.currentThread());
+            showDownLoadProgress(integer);
+            sub.request(Long.MAX_VALUE);
+          }
+
+          @Override public void onError(Throwable throwable) {
+            throwable.printStackTrace();
+            sub.cancel();
+          }
+
+          @Override public void onComplete() {
+            Log.e("1111","onComplete:"+Thread.currentThread());
+            if (mProgressDialog != null) {
+              mProgressDialog.dismiss();
+            }
+          }
+        });
+  }
+
+  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+      @NonNull int[] grantResults) {
+    if (requestCode == 100) {
+      if (grantResults.length > 0 && grantResults[0] == PermissionChecker.PERMISSION_GRANTED) {
+        startDownload();
+      } else {
+        Toast.makeText(MeiziDetaileActivity.this,"无法获取存储sdcard权限，下载失败",Toast.LENGTH_SHORT).show();
+      }
+    }
+
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
   ProgressDialog mProgressDialog = null;
