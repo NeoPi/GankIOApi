@@ -35,31 +35,31 @@ public class MeiziDetaileActivity extends BaseActivity {
 
   public static final String EXTRA_IMG_URL = "extra_img_url";
 
-  private SimpleDraweeView mSimpleDraweeView ;
+  private SimpleDraweeView mSimpleDraweeView;
   private Button mSaveButton = null;
   private String imageUrl = null;
+
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     setContentView(R.layout.activity_meizi_detail_layout);
     initView();
-
   }
 
   private void initView() {
     mSimpleDraweeView = (SimpleDraweeView) findViewById(R.id.meizi_detail_img);
-    mSaveButton= (Button) findViewById(R.id.btn_save);
+    mSaveButton = (Button) findViewById(R.id.btn_save);
     imageUrl = getIntent().getStringExtra(EXTRA_IMG_URL);
 
     ViewGroup.LayoutParams layoutParams = mSimpleDraweeView.getLayoutParams();
-    ControllerListener controllerListener = new BaseControllerListener<ImageInfo>(){
-      @Override
-      public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+    ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
+      @Override public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
         if (imageInfo == null) {
-          return ;
+          return;
         }
         layoutParams.width = DeviceUtils.SCREEN_WIDTH;
-        layoutParams.height = (int)((float) (DeviceUtils.SCREEN_WIDTH * imageInfo.getHeight() / imageInfo.getWidth()));
+        layoutParams.height = (int) ((float) (DeviceUtils.SCREEN_WIDTH * imageInfo.getHeight()
+            / imageInfo.getWidth()));
         mSimpleDraweeView.setLayoutParams(layoutParams);
       }
 
@@ -78,26 +78,25 @@ public class MeiziDetaileActivity extends BaseActivity {
         .build();
     mSimpleDraweeView.setController(mControl);
 
-
     mSaveButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         //imageUrl = "http://a1.bbs.xiaomi.cn/download/apk/xiaomibbs_20161110.apk";
 
-        if (ActivityCompat.checkSelfPermission(MeiziDetaileActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-             != PermissionChecker.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(MeiziDetaileActivity.this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE) != PermissionChecker.PERMISSION_GRANTED) {
           // TODO: 2017/03/04  no write external storage permission
 
-          if (ActivityCompat.shouldShowRequestPermissionRationale(MeiziDetaileActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+          if (ActivityCompat.shouldShowRequestPermissionRationale(MeiziDetaileActivity.this,
+              Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
           } else {
-            ActivityCompat.requestPermissions(MeiziDetaileActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},100);
+            ActivityCompat.requestPermissions(MeiziDetaileActivity.this,
+                new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, 100);
           }
-
         } else {
           startDownload();
         }
       }
-
     });
   }
 
@@ -106,8 +105,9 @@ public class MeiziDetaileActivity extends BaseActivity {
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Subscriber<Integer>() {
           Subscription sub = null;
+
           @Override public void onSubscribe(Subscription subscription) {
-            Log.e("1111","onSubscribe :"+Thread.currentThread());
+            Log.e("1111", "onSubscribe :" + Thread.currentThread());
             sub = subscription;
             showDownLoadProgress(0);
             sub.request(Long.MAX_VALUE);
@@ -125,7 +125,7 @@ public class MeiziDetaileActivity extends BaseActivity {
           }
 
           @Override public void onComplete() {
-            Log.e("1111","onComplete:"+Thread.currentThread());
+            Log.e("1111", "onComplete:" + Thread.currentThread());
             if (mProgressDialog != null) {
               mProgressDialog.dismiss();
             }
@@ -139,7 +139,7 @@ public class MeiziDetaileActivity extends BaseActivity {
       if (grantResults.length > 0 && grantResults[0] == PermissionChecker.PERMISSION_GRANTED) {
         startDownload();
       } else {
-        Toast.makeText(MeiziDetaileActivity.this,"无法获取存储sdcard权限，下载失败",Toast.LENGTH_SHORT).show();
+        Toast.makeText(MeiziDetaileActivity.this, "无法获取存储sdcard权限，下载失败", Toast.LENGTH_SHORT).show();
       }
     }
 
@@ -147,6 +147,7 @@ public class MeiziDetaileActivity extends BaseActivity {
   }
 
   ProgressDialog mProgressDialog = null;
+
   private void showDownLoadProgress(int progress) {
     if (mProgressDialog == null) {
       mProgressDialog = new ProgressDialog(this);
@@ -156,11 +157,9 @@ public class MeiziDetaileActivity extends BaseActivity {
       mProgressDialog.setCanceledOnTouchOutside(false);
     }
 
-
     if (!mProgressDialog.isShowing()) {
       mProgressDialog.show();
     }
     mProgressDialog.setProgress(progress);
-
   }
 }
