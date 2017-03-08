@@ -36,7 +36,7 @@
       android:layout_alignParentBottom="true"
       app:tabIndicatorColor="@null"
       app:tabMode="fixed"
-      app:tabBackground="@color/tab_color"
+
     >
 
   </android.support.design.widget.TabLayout>

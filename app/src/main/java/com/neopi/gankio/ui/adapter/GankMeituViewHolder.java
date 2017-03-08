@@ -1,7 +1,12 @@
 package com.neopi.gankio.ui.adapter;
 
+import android.content.Intent;
 import android.graphics.drawable.Animatable;
 import android.support.annotation.LayoutRes;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -10,9 +15,12 @@ import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.image.ImageInfo;
+import com.neopi.gankio.MainActivity;
 import com.neopi.gankio.R;
 import com.neopi.gankio.model.GankResult;
+import com.neopi.gankio.ui.activity.MeiziDetaileActivity;
 import com.neopi.gankio.utils.DeviceUtils;
+import javax.crypto.Mac;
 
 /**
  * Created by neopi on 17-3-1.
@@ -65,6 +73,24 @@ public class GankMeituViewHolder extends BaseViewHolder<GankResult> {
         .setUri(gankResult.getUrl())
         .build();
     mSimpleDraweeView.setController(mControl);
+
+
+    mSimpleDraweeView.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        Pair<View,String> pairImage = new Pair<View, String>(mSimpleDraweeView,"image");
+        Pair<View,String> pairTv = new Pair<View, String>(mAuthor,"mAuthor");
+
+        ActivityOptionsCompat options =
+            ActivityOptionsCompat.makeSceneTransitionAnimation((MainActivity)getContext(), pairImage,
+                pairTv);
+        Intent intent = new Intent(getContext(), MeiziDetaileActivity.class);
+        intent.putExtra(MeiziDetaileActivity.EXTRA_IMG_URL,gankResult.getUrl());
+        intent.putExtra(MeiziDetaileActivity.EXTRA_AUTHOR,gankResult.getWho());
+        intent.putExtra(MeiziDetaileActivity.EXTRA_IMAGE_WIDTH,mSimpleDraweeView.getWidth());
+        intent.putExtra(MeiziDetaileActivity.EXTRA_IMAGE_HEIGHT,mSimpleDraweeView.getHeight());
+        ActivityCompat.startActivity(getContext(),intent,options.toBundle());
+      }
+    });
 
   }
 }

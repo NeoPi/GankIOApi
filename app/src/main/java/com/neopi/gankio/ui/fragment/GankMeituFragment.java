@@ -50,7 +50,7 @@ public class GankMeituFragment extends Fragment {
     mRecyclerView = (RecyclerView) rootView.findViewById(R.id.gank_recycle_view);
     mSwipeRefresh = (SwipeRefreshLayout) rootView.findViewById(R.id.refresh_swiper_layout);
     mSwipeRefresh.setColorSchemeResources(
-        R.color.colorAccent,R.color.colorPrimary,R.color.colorPrimaryDark
+        R.color.primary,R.color.primary_light,R.color.accent
     );
     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
     mRecyclerView.setLayoutManager(linearLayoutManager);
